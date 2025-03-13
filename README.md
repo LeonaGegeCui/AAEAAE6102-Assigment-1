@@ -176,6 +176,11 @@ Take the Urban dataset as an example, the corresponding decoded ephemeris data i
 
 As the original code only has LS algorithm, so the original `leastSquarePos.m` is edited to satisfy the capability of WLS algorithm. The correlated changes are sum up as follows.
 ```
+%%% add initialization for weights %%%
+
+weight = ones(nmbOfSatellites, 1); 
+```
+```
 %%% Weight updating in the loop %%%
 
 weight(i)=sin(el(i))^2;
@@ -209,18 +214,13 @@ The function `postNavigation` takes `trackResults` as input to calculate navigat
 <center><font size='2'>(b) Urban dataset.</font></center>
 <center><font>Fig.12 The calculated coordinates variations in UTM systems.</font></center>
 
-The calculated user position results of the Opensky and the Urban dataset are shown in Fig.13. It is demonstrated in Fig.13 that the position error of the Opensky dataset is much more less than the Urban dataset. The calculated result of Opensky dataset utilizing the WLS algorithm shows close alignment to the ground truth, which is shown in Fig.13(a) with a red cross.
-<center><img src=figs/opensky-user_position.png width="57%" /></center>
-<center><font size='2'>(a) Opensky dataset.</font></center>
-<center><img src=figs/urban-user_position.png width="60%" /></center>
-<center><font size='2'>(b) Urban dataset.</font></center>
+The calculated user position results of the Opensky and the Urban dataset are shown in Fig.13. It is demonstrated in Fig.13 that the position error of the Opensky dataset is much more less than the Urban dataset. The calculated result of Opensky dataset utilizing the WLS algorithm shows close alignment to the ground truth, which is shown in Fig.13(a) with a red cross. Specifically, the extracted latitude and longitude information is as follows: latitude 22°19'42.3991" and longitude 114°10'16.8924". When converted to decimal degrees, this results in a latitude of 22.3289997 and a longitude of 114.171361, which is very close to the ground truth values (22.3284477008575, 114.171630049711).
+
+<center><img src=figs/position_WLS.png width="90%" /></center>
 <center><font>Fig.13 Illustration of the calculated user positioning results.</font></center>
 
 The user velocity is summarized in Fig. 14.
-<center><img src=figs/opensky-user_velocity.png width="57%" /></center>
-<center><font size='2'>(a) Opensky dataset.</font></center>
-<center><img src=figs/urban-user_velocity.png width="60%" /></center>
-<center><font size='2'>(b) Urban dataset.</font></center>
+<center><img src=figs/velocity_WLS.png width="80%" /></center>
 <center><font>Fig.14 Illustration of the calculated user velocity results.</font></center>
 
 ### <font color=#3399ff>4.3 Impact of multipath effects on the WLS solution</font>
@@ -237,12 +237,38 @@ Moreover, the reduced accuracy associated with multipath effects can be attribut
 ### <font color=#3399ff>5.1 Task Description</font>
 Develop an Extended Kalman Filter (EKF) using pseudorange and Doppler measurements to estimate user position and velocity.
 ### <font color=#3399ff>5.2 Method</font>
+The required EKF algorithm is designed as follows.
+```
+% prediction 
+X_kk = F * X;
+P_kk = F*P*F'+Q;
+...
+r = Z - h_x;
+S = H * P_kk * H' + R;
+K = P_kk * H' /S; % Kalman Gain
 
+% Update State Estimate
+X_k = X_kk + (K * r);
+I = eye(size(X, 1));
+P_k = (I - K * H) * P_kk * (I - K * H)' + K * R * K';
+```
+The correlated files are `ekf.m` and `postNavigation.m`, where the `ekf` function is called. The `postNavigation` function can be applies on the saved tracking data without doing the acquisition and tracking again.
 
 
 ### <font color=#3399ff>5.3 Results and Analysis</font>
 
+Fig.15 illustrates the estimated user position using EKF algorithm. Since the WLS algorithm has already acheived rather precise results in the Opensky dataset, the room for precision improvement is not so big. While when compared to the results estimated with the WLS algorithm, the discrepancy between the estimated user position and the ground truth coordinates decreases significantly with the EKF algorithm in the Urban dataset. This indicates that the EKF algorithm enhances the precision of the user position estimation. This inprovement may result from the EKF's inherent advantages in dynamic state estimation.
 
+<center><img src=figs/position_EKF.png width="90%" /></center>
+<center><font>Fig.15 Illustration of the calculated user positioning results.</font></center>
+
+
+
+Fig.16 illustrates the user velocity estimated using EKF in both the Opensky and Urban datasets. In contrast to the findings from user position and velocity estimation using WLS algorithm, the user velocity falls within a more realistic range, suggesting a reduction in the multipath effect to some degree. Additionally, the estimated velocity using EKF appears to be more stable than using WLS, as there are few instances of abrupt changes in velocity.
+
+
+<center><img src=figs/velocity_EKF.png width="80%" /></center>
+<center><font>Fig.16 Illustration of the calculated user velocity results.</font></center>
 
 
 
