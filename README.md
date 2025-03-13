@@ -122,7 +122,7 @@ Analyze from the correlation results shown in Fig.6, the correlation of the Prom
 <center><font>Fig.6 Illustration of the correlation results.</font></center>
 
 
-### <font color=#3399ff>2.3.1 Urban</font>
+### <font color=#3399ff>2.3.2 Urban</font>
 **PRN 11** is selected as an example to analyze the tracking results of Urban dataset. Compared to the result of the opensky data in Fig.4, the distribution of Q-chennal value shown in Fig.7 is more spread out, although it still seems centering around zero. This demonstrated that the carrier phase in the Urban dataset is not aligned well, since not all energy are concentrated on I-channel.
 <center><img src=figs/urban-discrete_time_scatter.png width="45%" /></center>
 <center><font>Fig.7 Plot of discrete-time scattering of the Opensky dataset.</font></center>
@@ -223,7 +223,7 @@ The user velocity is summarized in Fig. 14.
 <center><img src=figs/velocity_WLS.png width="80%" /></center>
 <center><font>Fig.14 Illustration of the calculated user velocity results.</font></center>
 
-### <font color=#3399ff>4.3 Impact of multipath effects on the WLS solution</font>
+### <font color=#3399ff>4.4 Impact of multipath effects on the WLS solution</font>
 Based on the previous analysis, the user's position calculated from the Opensky dataset aligns perfectly with the ground truth coordinates. In contrast, a noticeable discrepancy is evident in the Urban dataset. This is primarily due to multipath effects caused by GPS signals reflecting off tall buildings, which results in these signals traveling longer distances than the direct line-of-sight signals. Consequently, this negatively impacts the accuracy of the user's antenna position determination. Additionally, the presence of multipath signals can cause the estimated position to fluctuate significantly when these signals reach the antenna shortly after the direct signals, leading to unrealistically high velocity estimates. In comparison, the velocity values in the Opensky dataset remain more realistic. The multipath effect can also contribute to instability in velocity estimates, such as abrupt drops in speed at specific time intervals.
 
 Moreover, the reduced accuracy associated with multipath effects can be attributed to the traditional scalar tracking loops striving to achieve E=L. This often results in biases in the prompt tracking point, leading to errors in range measurements. Therefore, when multipath effects are present, a significant difference between the estimated user position (from the WLS solution) and the actual ground truth coordinates is likely to be observed.
